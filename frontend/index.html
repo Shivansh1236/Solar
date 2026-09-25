@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Solar Power Generation Analysis</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVIGATION
+    ========================== -->
+
+    <header class="navbar">
+
+        <a href="#overview" class="brand">
+
+            <div class="brand-icon">
+                ☀
+            </div>
+
+            <div class="brand-text">
+                <strong>SOLAR</strong>
+                <span>POWER ANALYSIS</span>
+            </div>
+
+        </a>
+
+
+        <nav class="nav-links">
+
+            <a href="#overview">
+                Overview
+            </a>
+
+            <a href="#prediction">
+                Predict
+            </a>
+
+            <a href="#about">
+                About
+            </a>
+
+        </nav>
+
+
+        <div class="nav-status">
+            <span></span>
+            MODEL ONLINE
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <!-- =========================
+             HERO / OVERVIEW
+        ========================== -->
+
+        <section class="hero" id="overview">
+
+            <!-- Sky background -->
+
+            <div class="hero-sky"></div>
+
+
+            <!-- Sun -->
+
+            <div class="hero-sun">
+
+                <div class="hero-sun-glow"></div>
+
+            </div>
+
+
+            <!-- Clouds -->
+
+            <div class="hero-cloud hero-cloud-one"></div>
+
+            <div class="hero-cloud hero-cloud-two"></div>
+
+            <div class="hero-cloud hero-cloud-three"></div>
+
+
+            <!-- Hero content -->
+
+            <div class="hero-content">
+
+                <div class="eyebrow">
+                    SOLAR ENERGY · MACHINE LEARNING
+                </div>
+
+
+                <h1>
+                    Predict the
+                    <span>power</span>
+                    of sunlight.
+                </h1>
+
+
+                <p class="hero-description">
+                    A machine-learning system that analyzes solar
+                    conditions and estimates AC power generation
+                    using a trained Random Forest regression model.
+                </p>
+
+
+                <div class="hero-actions">
+
+                    <a
+                        href="#prediction"
+                        class="primary-button">
+
+                        Start prediction
+
+                        <span>→</span>
+
+                    </a>
+
+
+                    <a
+                        href="#about"
+                        class="secondary-button">
+
+                        Explore project
+
+                    </a>
+
+                </div>
+
+
+                <div class="hero-meta">
+
+                    <div>
+
+                        <strong>
+                            RANDOM FOREST
+                        </strong>
+
+                        <span>
+                            Regression model
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            LIVE WEATHER
+                        </strong>
+
+                        <span>
+                            Real-time conditions
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            AC POWER
+                        </strong>
+
+                        <span>
+                            Prediction target
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             OVERVIEW CARDS
+        ========================== -->
+
+        <section class="overview-cards">
+
+            <div class="overview-card">
+
+                <div class="overview-icon">
+                    ☀
+                </div>
+
+                <div>
+
+                    <span>
+                        INPUT
+                    </span>
+
+                    <h3>
+                        Solar conditions
+                    </h3>
+
+                    <p>
+                        Environmental and time-based conditions
+                        are converted into model features.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="overview-card">
+
+                <div class="overview-icon">
+                    ◈
+                </div>
+
+                <div>
+
+                    <span>
+                        MODEL
+                    </span>
+
+                    <h3>
+                        Random Forest
+                    </h3>
+
+                    <p>
+                        The trained regression model estimates
+                        AC power from the prepared features.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="overview-card">
+
+                <div class="overview-icon">
+                    ↗
+                </div>
+
+                <div>
+
+                    <span>
+                        OUTPUT
+                    </span>
+
+                    <h3>
+                        AC Power
+                    </h3>
+
+                    <p>
+                        The predicted solar generation is displayed
+                        directly in kilowatts.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PREDICTION
+        ========================== -->
+
+        <section
+            class="prediction-section"
+            id="prediction">
+
+
+            <div class="section-intro">
+
+                <div>
+
+                    <div class="eyebrow">
+                        PREDICTION ENGINE
+                    </div>
+
+                    <h2>
+                        Estimate solar output
+                    </h2>
+
+                </div>
+
+
+                <p>
+                    Use live environmental conditions or manually
+                    provide the features required by the trained model.
+                </p>
+
+            </div>
+
+
+            <!-- =========================
+                 TABS
+            ========================== -->
+
+            <div class="prediction-tabs">
+
+                <button
+                    class="prediction-tab active"
+                    data-mode="live"
+                    type="button">
+
+                    Live prediction
+
+                </button>
+
+
+                <button
+                    class="prediction-tab"
+                    data-mode="manual"
+                    type="button">
+
+                    Manual prediction
+
+                </button>
+
+            </div>
+
+
+            <!-- =========================
+                 LIVE PANEL
+            ========================== -->
+
+            <div
+                class="prediction-panel active"
+                id="live-panel">
+
+
+                <div class="prediction-layout">
+
+
+                    <!-- =========================
+                         LIVE INPUT CARD
+                    ========================== -->
+
+                    <div class="live-input-card">
+
+
+                        <div class="card-top">
+
+                            <div>
+
+                                <span class="card-label">
+                                    LIVE MODE
+                                </span>
+
+                                <h3>
+                                    Current solar conditions
+                                </h3>
+
+                            </div>
+
+
+                            <span class="live-badge">
+
+                                <i></i>
+
+                                LIVE
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- Location -->
+
+                        <label class="field-label">
+                            Prediction location
+                        </label>
+
+
+                        <div class="location-control">
+
+                            <input
+                                type="text"
+                                id="location"
+                                value="Chandigarh"
+                                placeholder="Enter city">
+
+
+                            <button
+                                id="weatherButton"
+                                type="button">
+
+                                Fetch weather
+
+                                <span>
+                                    →
+                                </span>
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- Model input heading -->
+
+                        <div class="data-heading">
+
+                            <div>
+                                MODEL INPUTS
+                            </div>
+
+                            <span>
+                                Live / derived data
+                            </span>
+
+                        </div>
+
+
+                        <!-- =========================
+                             INPUT GRID
+                        ========================== -->
+
+                        <div class="input-data-grid">
+
+
+                            <!-- Ambient Temperature -->
+
+                            <div class="live-data-item">
+
+                                <span>
+                                    Ambient temperature
+                                </span>
+
+                                <strong>
+
+                                    <b id="liveTemperature">
+                                        —
+                                    </b>
+
+                                    <small>
+                                        °C
+                                    </small>
+
+                                </strong>
+
+                                <em>
+                                    Open-Meteo
+                                </em>
+
+                            </div>
+
+
+                            <!-- Irradiation -->
+
+                            <div class="live-data-item">
+
+                                <span>
+                                    Solar irradiation
+                                </span>
+
+                                <strong>
+
+                                    <b id="liveIrradiation">
+                                        —
+                                    </b>
+
+                                    <small>
+                                        W/m²
+                                    </small>
+
+                                </strong>
+
+                                <em>
+                                    Open-Meteo
+                                </em>
+
+                            </div>
+
+
+                            <!-- Hour -->
+
+                            <div class="live-data-item">
+
+                                <span>
+                                    Hour
+                                </span>
+
+                                <strong>
+
+                                    <b id="liveHour">
+                                        —
+                                    </b>
+
+                                </strong>
+
+                                <em>
+                                    Location time
+                                </em>
+
+                            </div>
+
+
+                            <!-- Day -->
+
+                            <div class="live-data-item">
+
+                                <span>
+                                    Day
+                                </span>
+
+                                <strong>
+
+                                    <b id="liveDay">
+                                        —
+                                    </b>
+
+                                </strong>
+
+                                <em>
+                                    Location date
+                                </em>
+
+                            </div>
+
+
+                            <!-- Month -->
+
+                            <div class="live-data-item">
+
+                                <span>
+                                    Month
+                                </span>
+
+                                <strong>
+
+                                    <b id="liveMonth">
+                                        —
+                                    </b>
+
+                                </strong>
+
+                                <em>
+                                    Location date
+                                </em>
+
+                            </div>
+
+
+                            <!-- Weekday -->
+
+                            <div class="live-data-item">
+
+                                <span>
+                                    Weekday
+                                </span>
+
+                                <strong>
+
+                                    <b id="liveWeekday">
+                                        —
+                                    </b>
+
+                                </strong>
+
+                                <em>
+                                    Location date
+                                </em>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =========================
+                             ASSUMPTIONS
+                        ========================== -->
+
+                        <div class="assumption-box">
+
+
+                            <div class="assumption-title">
+                                MODEL ASSUMPTIONS
+                            </div>
+
+
+                            <!-- Module temperature -->
+
+                            <div class="assumption-item">
+
+                                <div>
+
+                                    <strong>
+                                        Module temperature
+                                    </strong>
+
+                                    <span>
+                                        Estimated from ambient
+                                        temperature and irradiation
+                                    </span>
+
+                                </div>
+
+                                <b
+                                    id="assumedModuleTemperature">
+                                    —
+                                </b>
+
+                            </div>
+
+
+                            <!-- Source key -->
+
+                            <div class="assumption-item">
+
+                                <div>
+
+                                    <strong>
+                                        Source / inverter key
+                                    </strong>
+
+                                    <span>
+                                        Fixed to the selected
+                                        model configuration
+                                    </span>
+
+                                </div>
+
+                                <b id="assumedSourceKey">
+                                    0
+                                </b>
+
+                            </div>
+
+
+                            <p class="assumption-note">
+
+                                These two values are estimated or fixed
+                                because they are not available from the
+                                live weather source.
+
+                            </p>
+
+                        </div>
+
+
+                        <!-- Prediction button -->
+
+                        <button
+                            class="large-predict-button"
+                            id="livePredict"
+                            type="button">
+
+                            <span>
+                                Predict current generation
+                            </span>
+
+                            <span>
+                                ↗
+                            </span>
+
+                        </button>
+
+
+                        <p
+                            class="live-message"
+                            id="liveMessage">
+
+                            Fetch current weather conditions
+                            to begin.
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- =========================
+                         LIVE RESULT
+                    ========================== -->
+
+                    <div class="prediction-result">
+
+
+                        <div class="result-top">
+
+                            <span>
+                                LIVE PREDICTION
+                            </span>
+
+
+                            <div>
+
+                                <i></i>
+
+                                AWAITING DATA
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="result-content">
+
+                            <span class="result-caption">
+                                Estimated generation
+                            </span>
+
+
+                            <div class="result-number">
+
+                                <strong id="liveResult">
+                                    —
+                                </strong>
+
+                                <span>
+                                    kW
+                                </span>
+
+                            </div>
+
+
+                            <p>
+                                Estimated AC power generated under
+                                the current conditions using the
+                                trained Random Forest model.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 MANUAL PANEL
+            ========================== -->
+
+            <div
+                class="prediction-panel"
+                id="manual-panel">
+
+
+                <div class="manual-layout">
+
+
+                    <!-- Manual input -->
+
+                    <div class="manual-card">
+
+
+                        <div class="card-top">
+
+                            <div>
+
+                                <span class="card-label">
+                                    MANUAL MODE
+                                </span>
+
+                                <h3>
+                                    Enter model inputs
+                                </h3>
+
+                            </div>
+
+
+                            <span class="card-number">
+                                02
+                            </span>
+
+                        </div>
+
+
+                        <div class="manual-grid">
+
+
+                            <!-- Ambient -->
+
+                            <div class="manual-field">
+
+                                <label>
+                                    Ambient temperature
+                                </label>
+
+                                <div>
+
+                                    <input
+                                        type="number"
+                                        id="ambientTemperature"
+                                        placeholder="Enter temperature"
+                                        step="0.1">
+
+                                    <span>
+                                        °C
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Module -->
+
+                            <div class="manual-field">
+
+                                <label>
+                                    Module temperature
+                                </label>
+
+                                <div>
+
+                                    <input
+                                        type="number"
+                                        id="moduleTemperature"
+                                        placeholder="Enter temperature"
+                                        step="0.1">
+
+                                    <span>
+                                        °C
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Irradiation -->
+
+                            <div class="manual-field">
+
+                                <label>
+                                    Irradiation
+                                </label>
+
+                                <div>
+
+                                    <input
+                                        type="number"
+                                        id="irradiation"
+                                        placeholder="0.00 – 1.22"
+                                        step="0.01">
+
+                                    <span>
+                                        kW/m²
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Hour -->
+
+                            <div class="manual-field">
+
+                                <label>
+                                    Hour
+                                </label>
+
+                                <div>
+
+                                    <input
+                                        type="number"
+                                        id="hour"
+                                        placeholder="0 – 23"
+                                        min="0"
+                                        max="23">
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Day -->
+
+                            <div class="manual-field">
+
+                                <label>
+                                    Day
+                                </label>
+
+                                <div>
+
+                                    <input
+                                        type="number"
+                                        id="day"
+                                        placeholder="1 – 31"
+                                        min="1"
+                                        max="31">
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Month -->
+
+                            <div class="manual-field">
+
+                                <label>
+                                    Month
+                                </label>
+
+                                <div>
+
+                                    <input
+                                        type="number"
+                                        id="month"
+                                        placeholder="1 – 12"
+                                        min="1"
+                                        max="12">
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Weekday -->
+
+                            <div class="manual-field">
+
+                                <label>
+                                    Weekday
+                                </label>
+
+                                <div>
+
+                                    <input
+                                        type="number"
+                                        id="weekday"
+                                        placeholder="0 – 6"
+                                        min="0"
+                                        max="6">
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Weekend -->
+
+                            <div class="manual-field">
+
+                                <label>
+                                    Weekend
+                                </label>
+
+                                <div>
+
+                                    <select id="isWeekend">
+
+                                        <option
+                                            value=""
+                                            selected
+                                            disabled>
+
+                                            Select
+
+                                        </option>
+
+                                        <option value="0">
+                                            No — weekday
+                                        </option>
+
+                                        <option value="1">
+                                            Yes — weekend
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Source key -->
+
+                            <div class="manual-field">
+
+                                <label>
+                                    Source key
+                                </label>
+
+                                <div>
+
+                                    <input
+                                        type="number"
+                                        id="sourceKey"
+                                        placeholder="Enter source key">
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            class="large-predict-button"
+                            id="manualPredict"
+                            type="button">
+
+                            <span>
+                                Run prediction
+                            </span>
+
+                            <span>
+                                ↗
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- Manual result -->
+
+                    <div
+                        class="prediction-result manual-result-box">
+
+
+                        <div class="result-top">
+
+                            <span>
+                                MODEL OUTPUT
+                            </span>
+
+
+                            <div>
+
+                                <i></i>
+
+                                READY
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="result-content">
+
+                            <span class="result-caption">
+                                Predicted AC power
+                            </span>
+
+
+                            <div class="result-number">
+
+                                <strong id="manualResult">
+                                    —
+                                </strong>
+
+                                <span>
+                                    kW
+                                </span>
+
+                            </div>
+
+
+                            <p id="manualMessage">
+                                Enter the model inputs to
+                                generate a prediction.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             ABOUT
+        ========================== -->
+
+        <section
+            class="about-section"
+            id="about">
+
+
+            <div class="about-heading">
+
+                <div class="eyebrow">
+                    ABOUT THE PROJECT
+                </div>
+
+
+                <h2>
+                    From solar conditions
+                    to predicted power.
+                </h2>
+
+            </div>
+
+
+            <div class="about-grid">
+
+
+                <div class="about-main">
+
+                    <p>
+                        This project uses historical solar plant
+                        generation data to train a Random Forest
+                        regression model capable of estimating
+                        AC power generation.
+                    </p>
+
+
+                    <p>
+                        The live prediction system retrieves current
+                        environmental conditions, prepares them in
+                        the same feature format used during training,
+                        and sends them to the trained model through
+                        a Flask backend.
+                    </p>
+
+                </div>
+
+
+                <div class="about-steps">
+
+
+                    <div>
+
+                        <span>
+                            01
+                        </span>
+
+                        <strong>
+                            Collect
+                        </strong>
+
+                        <p>
+                            Retrieve current solar conditions.
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            02
+                        </span>
+
+                        <strong>
+                            Prepare
+                        </strong>
+
+                        <p>
+                            Convert live data into model features.
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            03
+                        </span>
+
+                        <strong>
+                            Predict
+                        </strong>
+
+                        <p>
+                            Generate AC power using Random Forest.
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            04
+                        </span>
+
+                        <strong>
+                            Display
+                        </strong>
+
+                        <p>
+                            Present predicted generation.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer>
+
+        <div>
+
+            <strong>
+                SOLAR
+            </strong>
+
+            <span>
+                POWER ANALYSIS
+            </span>
+
+        </div>
+
+
+        <p>
+            Machine Learning · Energy Analytics
+        </p>
+
+    </footer>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
