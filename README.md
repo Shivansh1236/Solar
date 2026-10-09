@@ -12,8 +12,11 @@ The project follows a complete end-to-end Data Science pipeline, including:
 - Feature Engineering
 - Machine Learning
 - Model Evaluation
+- Frontend Development
+- Backend Development
+- ML Model Integration
 
-The objective is to identify the key factors affecting solar power generation and develop an accurate predictive model.
+The objective is to identify the key factors affecting solar power generation and develop an accurate predictive model. The trained model is integrated into a web application that uses current weather data to estimate AC power generation under the given conditions.
 
 ---
 
@@ -45,10 +48,18 @@ The project uses the **Solar Power Generation Dataset** containing:
 - Pandas
 - NumPy
 - Matplotlib
+- Seaborn
 - Scikit-learn
 - Jupyter Notebook
+- Flask
+- Flask-CORS
+- HTML
+- CSS
+- JavaScript
+- Open-Meteo API
 - Git
 - GitHub
+- Git LFS
 
 ---
 
@@ -69,8 +80,6 @@ SOLAR/
 │       ├── Plant_1_Weather_Cleaned.csv
 │       └── Plant_1_Feature_Engineered.csv
 │
-├── models/
-│
 ├── Notebooks/
 │   ├── Data_understanding.ipynb
 │   ├── Data_cleaning.ipynb
@@ -78,17 +87,22 @@ SOLAR/
 │   ├── Feature_Engineering.ipynb
 │   └── Machine_Learning.ipynb
 │
-├── Powerbi/
+├── backend/
+│   └── app.py
+│
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
 │
 ├── report/
 │   └── Data_Dictionary.md
 │
-├── sql/
-├── src/
-│
+├── random_forest_model.pkl
+├── .gitattributes
+├── .gitignore
 ├── README.md
-├── requirements.txt
-└── .gitignore
+└── requirements.txt
 ```
 
 ---
@@ -155,6 +169,10 @@ Evaluation Metrics:
 - Root Mean Squared Error (RMSE)
 - R² Score
 
+The **Random Forest Regressor** was selected as the final model based on the evaluation results.
+
+The trained model is saved as `random_forest_model.pkl` and used by the backend for predictions.
+
 ---
 
 # 📊 Model Performance
@@ -165,7 +183,7 @@ Evaluation Metrics:
 | Decision Tree | 0.1653 | 0.8716 | 0.999995 |
 | **Random Forest** | **0.1304** | **0.8229** | **0.999996** |
 
-The **Random Forest Regressor** achieved the best predictive performance.
+The **Random Forest Regressor** achieved the best predictive performance among the three models.
 
 ---
 
@@ -188,27 +206,126 @@ To build a more meaningful predictive model, the following features were exclude
 
 ---
 
+# 🌐 Web Application
+
+The project includes a web application that integrates the trained machine learning model with a user-friendly interface.
+
+### Frontend
+
+The frontend is developed using:
+
+- HTML for page structure
+- CSS for styling and responsive layout
+- JavaScript for interactions, weather data retrieval, and API communication
+
+The interface provides live-weather-based prediction and manual prediction options.
+
+### Backend
+
+The backend is developed using **Flask**, a lightweight Python web framework.
+
+It provides a `/predict` API endpoint that:
+
+- Receives input features from the frontend.
+- Prepares the input data in the format expected by the trained model.
+- Loads and uses the saved Random Forest model.
+- Returns the predicted AC power as a JSON response.
+
+### Live Weather Integration
+
+The application uses the **Open-Meteo API** to retrieve current weather information for a selected location.
+
+The live prediction workflow is:
+
+1. The user enters a location.
+2. The application retrieves current weather data.
+3. Relevant model features, including temperature, irradiation, and time-based features, are prepared.
+4. Module temperature is estimated, and the configured inverter key is supplied where required.
+5. The prepared features are sent to the Flask backend.
+6. The trained Random Forest model predicts AC power.
+7. The prediction is displayed on the website.
+
+Some model inputs are estimated or fixed because they are not directly available from the live weather API. Therefore, live predictions are estimates under the selected model configuration.
+
+### Manual Prediction
+
+Users can also enter the model input features manually and obtain a prediction through the same backend API.
+
+---
+
+# ⚙️ Installation and Setup
+
+### Prerequisites
+
+- Python installed on the system
+- A modern web browser
+- Git, if cloning the repository
+- Git LFS to retrieve the saved model when cloning the repository
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Shivansh1236/Solar.git
+cd Solar
+```
+
+### 2. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Start the Backend
+
+From the project root directory, run:
+
+```bash
+python backend/app.py
+```
+
+The Flask server should start at:
+
+```text
+http://127.0.0.1:5000
+```
+
+Keep the terminal running while using the prediction feature.
+
+### 4. Open the Frontend
+
+Open `frontend/index.html` in a web browser.
+
+The frontend can display its interface independently, but the prediction feature requires the Flask backend to be running on the same computer.
+
+**Note:** The saved model is tracked using Git LFS because of its large file size. Make sure the actual model file is downloaded before starting the backend. If necessary, run:
+
+```bash
+git lfs install
+git lfs pull
+```
+
+---
+
 # 💡 Key Insights
 
 - Solar irradiation is the primary driver of AC power generation.
 - Weather conditions significantly influence solar energy production.
 - Random Forest effectively captures the nonlinear relationship between environmental variables and power generation.
+- Integrating the trained model with a web application makes predictions accessible through a simple user interface.
 
 ---
 
 # 🔮 Future Improvements
 
-- Cross-validation
-- Interactive Power BI dashboard
-- Save trained models
-- Real-time solar power prediction
+- Cross-validation and further evaluation on unseen dates and inverters.
+- Online deployment of the frontend and backend for public access.
+- Improved module-temperature estimation using additional sensor data.
+- Prediction history and downloadable prediction results.
+- Further validation of model performance under different weather conditions.
 
 ---
 
 # 👨‍💻 Author
 
-**Arush Bisht**
-
-B.Tech – Computer Science & Engineering (Data Science)
-
+Minor Team 
 Punjab Engineering College, Chandigarh
