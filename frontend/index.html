@@ -8,6 +8,7 @@
     <title>Solar Power Generation Analysis</title>
 
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="shared-ui.css">
 </head>
 
 <body>
@@ -32,27 +33,15 @@
         </a>
 
 
-        <nav class="nav-links">
-
-            <a href="#overview">
-                Overview
-            </a>
-
-            <a href="#prediction">
-                Predict
-            </a>
-
-            <a href="#about">
-                About
-            </a>
-
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="#overview" class="active">Dashboard</a>
+            <a href="#prediction">Predict</a>
+            <a href="history.html">History</a>
+            <a href="analysis.html">Analysis Desk</a>
+            <a href="outlook.html">Solar Outlook</a>
+            <a href="#about">About</a>
         </nav>
-
-
-        <div class="nav-status">
-            <span></span>
-            MODEL ONLINE
-        </div>
+        <div class="nav-status"><span></span> MODEL ONLINE</div>
 
     </header>
 
@@ -106,8 +95,8 @@
 
                 <p class="hero-description">
                     A machine-learning system that analyzes solar
-                    conditions and estimates AC power generation
-                    using a trained Random Forest regression model.
+                    conditions and estimates AC power generation using
+                    a plant-specific trained regression model.
                 </p>
 
 
@@ -140,11 +129,11 @@
                     <div>
 
                         <strong>
-                            RANDOM FOREST
+                            TWO PLANT MODELS
                         </strong>
 
                         <span>
-                            Regression model
+                            XGBoost · Random Forest
                         </span>
 
                     </div>
@@ -227,12 +216,12 @@
                     </span>
 
                     <h3>
-                        Random Forest
+                        Plant-specific models
                     </h3>
 
                     <p>
-                        The trained regression model estimates
-                        AC power from the prepared features.
+                        Plant 1 uses XGBoost and Plant 2 uses
+                        Random Forest to estimate AC power.
                     </p>
 
                 </div>
@@ -296,6 +285,30 @@
                     Use live environmental conditions or manually
                     provide the features required by the trained model.
                 </p>
+
+            </div>
+
+
+            <!-- =========================
+                 PLANT / MODEL SELECTOR
+            ========================== -->
+
+            <div class="plant-selection-bar">
+
+                <div class="plant-selection-copy">
+                    <span class="card-label">MODEL CONFIGURATION</span>
+                    <h3>Choose solar plant</h3>
+                    <p>The selected plant determines which trained model handles Live and Manual predictions.</p>
+                </div>
+
+                <div class="plant-selection-control">
+                    <label for="plantSelector">Prediction plant</label>
+                    <select id="plantSelector" name="plant_id">
+                        <option value="1" selected>Plant 1 — XGBoost</option>
+                        <option value="2">Plant 2 — Random Forest</option>
+                    </select>
+                    <span class="plant-model-hint" id="selectedPlantModel">Active model: Plant 1 · XGBoost</span>
+                </div>
 
             </div>
 
@@ -694,7 +707,7 @@
 
                                 <i></i>
 
-                                AWAITING DATA
+                                <span id="liveResultStatus">AWAITING DATA</span>
 
                             </div>
 
@@ -706,6 +719,7 @@
                             <span class="result-caption">
                                 Estimated generation
                             </span>
+                            <span class="result-model-chip" id="liveModelLabel">Plant 1 · XGBoost</span>
 
 
                             <div class="result-number">
@@ -724,7 +738,7 @@
                             <p>
                                 Estimated AC power generated under
                                 the current conditions using the
-                                trained Random Forest model.
+                                model assigned to the selected plant.
                             </p>
 
                         </div>
@@ -1034,7 +1048,7 @@
 
                                 <i></i>
 
-                                READY
+                                <span id="manualResultStatus">READY</span>
 
                             </div>
 
@@ -1046,6 +1060,7 @@
                             <span class="result-caption">
                                 Predicted AC power
                             </span>
+                            <span class="result-model-chip" id="manualModelLabel">Plant 1 · XGBoost</span>
 
 
                             <div class="result-number">
@@ -1108,8 +1123,8 @@
 
                     <p>
                         This project uses historical solar plant
-                        generation data to train a Random Forest
-                        regression model capable of estimating
+                        generation data to train plant-specific
+                        regression models capable of estimating
                         AC power generation.
                     </p>
 
@@ -1173,7 +1188,7 @@
                         </strong>
 
                         <p>
-                            Generate AC power using Random Forest.
+                            Use the selected plant's trained model.
                         </p>
 
                     </div>

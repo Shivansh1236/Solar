@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Desk | SOLAR</title>
+    <link rel="stylesheet" href="analysis.css">
+    <link rel="stylesheet" href="shared-ui.css">
+</head>
+<body>
+    <header class="navbar">
+        <a href="index.html" class="brand">
+            <div class="brand-icon">☀</div>
+            <div class="brand-text"><strong>SOLAR</strong><span>POWER ANALYSIS</span></div>
+        </a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="index.html">Dashboard</a>
+            <a href="index.html#prediction">Predict</a>
+            <a href="history.html">History</a>
+            <a href="analysis.html" class="active">Analysis Desk</a>
+            <a href="outlook.html">Solar Outlook</a>
+        </nav>
+    </header>
+
+    <main class="page-wrap">
+        <section class="page-heading">
+            <div class="eyebrow">LIVE MONITORING WORKSPACE</div>
+            <h1>Analysis Desk</h1>
+            <p>Collect weather-based model estimates at a selected location and interval. Each run fetches one shared weather observation and compares both plant models by default. Each run is saved as a separate analysis session.</p>
+        </section>
+
+        <section class="top-grid">
+            <div class="panel config-panel">
+                <div class="panel-heading">
+                    <div><span class="kicker">NEW SESSION</span><h2>Configure monitoring</h2></div>
+                    <span class="step-tag">01 / SETUP</span>
+                </div>
+
+                <form id="analysisForm">
+                    <div class="field full-field">
+                        <label for="locationInput">Location / city</label>
+                        <input id="locationInput" type="text" value="Chandigarh" placeholder="Enter a city, e.g. Chandigarh" required>
+                    </div>
+
+                    <div class="field full-field">
+                        <label for="sessionNameInput">Session name <span class="optional-label">Optional</span></label>
+                        <input id="sessionNameInput" type="text" maxlength="80" placeholder="e.g. Chandigarh midday baseline">
+                    </div>
+
+                    <div class="field-grid">
+                        <div class="field">
+                            <label for="sessionTagInput">Session category</label>
+                            <select id="sessionTagInput">
+                                <option value="General" selected>General</option>
+                                <option value="Baseline">Baseline</option>
+                                <option value="Location comparison">Location comparison</option>
+                                <option value="Weather observation">Weather observation</option>
+                                <option value="Testing">Testing</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="sessionDescriptionInput">Description <span class="optional-label">Optional</span></label>
+                            <input id="sessionDescriptionInput" type="text" maxlength="180" placeholder="Purpose or notes for this run">
+                        </div>
+                    </div>
+                    <p class="help-text local-meta-note">Session name, category, and description are saved in this browser. The database session ID remains unchanged.</p>
+
+                    <div class="comparison-mode-card" id="comparisonModeCard">
+                        <div class="comparison-mode-copy">
+                            <span class="mode-kicker">MODEL RUN MODE</span>
+                            <strong id="analysisModeLabel">Both plants · Default comparison</strong>
+                            <p>One weather reading is sent to both plant-specific models. Both predictions are saved together.</p>
+                            <span class="mode-lock-note" id="modeLockNote">🔒 Single-plant mode is locked. Unlock it only when you want to run one plant.</span>
+                        </div>
+                        <button class="secondary-button mode-unlock-button" id="unlockSinglePlantButton" type="button">Unlock single-plant mode</button>
+                        <div class="single-plant-options" id="singlePlantOptions" hidden>
+                            <div class="field">
+                                <label for="singlePlantSelect">Run only this plant</label>
+                                <select id="singlePlantSelect">
+                                    <option value="1">Plant 1 · XGBoost</option>
+                                    <option value="2">Plant 2 · Random Forest</option>
+                                </select>
+                            </div>
+                            <button class="text-button" id="lockComparisonButton" type="button">Lock and compare both plants</button>
+                        </div>
+                    </div>
+
+                    <div class="field-grid">
+                        <div class="field">
+                            <label for="intervalInput">Collection interval</label>
+                            <select id="intervalInput">
+                                <option value="1">Every 1 minute</option>
+                                <option value="5" selected>Every 5 minutes</option>
+                                <option value="10">Every 10 minutes</option>
+                                <option value="15">Every 15 minutes</option>
+                                <option value="30">Every 30 minutes</option>
+                                <option value="60">Every 60 minutes</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="maxReadingsInput">Maximum readings</label>
+                            <input id="maxReadingsInput" type="number" min="1" max="10000" placeholder="Leave empty for no limit">
+                        </div>
+                    </div>
+
+                    <div class="subsection-title">MODEL INPUTS NOT PROVIDED BY WEATHER API</div>
+
+                    <div class="field-grid">
+                        <div class="field">
+                            <label for="moduleMode">Module temperature</label>
+                            <select id="moduleMode">
+                                <option value="estimated" selected>Estimate automatically</option>
+                                <option value="manual">Enter manually</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="moduleValue">Manual module temperature (°C)</label>
+                            <input id="moduleValue" type="number" step="0.1" placeholder="Only used in manual mode" disabled>
+                        </div>
+                        <div class="field">
+                            <label for="sourceMode">Source / inverter key</label>
+                            <select id="sourceMode">
+                                <option value="fixed" selected>Use fixed value (0)</option>
+                                <option value="manual">Enter manually</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="sourceValue">Manual source key</label>
+                            <input id="sourceValue" type="number" step="1" value="0" disabled>
+                        </div>
+                    </div>
+
+                    <p class="help-text">The same module-temperature assumption and numeric source-key value are applied to both models. Each plant was label-encoded separately, so the same source-key number is not guaranteed to identify the same physical inverter on both plants. AC power here is an inverter-level estimate, not total plant output.</p>
+
+                    <div class="form-actions">
+                        <button class="primary-button" id="startButton" type="submit">Start analysis <span>↗</span></button>
+                        <button class="stop-button" id="stopButton" type="button" disabled>Stop session</button>
+                    </div>
+                    <p id="formMessage" class="form-message" role="status">Configure a location and start a new session.</p>
+                </form>
+            </div>
+
+            <div class="panel status-panel">
+                <div class="panel-heading">
+                    <div><span class="kicker">SESSION STATUS</span><h2>Monitoring status</h2></div>
+                    <span id="statusBadge" class="status-badge idle">IDLE</span>
+                </div>
+                <div class="status-location" id="statusLocation">No active session</div>
+                <p id="statusDescription" class="muted">Once started, the page will fetch weather data immediately and then at your selected interval.</p>
+                <div class="status-details">
+                    <div><span>Session name</span><strong id="statusSessionId">—</strong></div>
+                    <div><span>Interval</span><strong id="statusInterval">—</strong></div>
+                    <div><span>Readings saved</span><strong id="statusReadings">0</strong></div>
+                    <div><span>Last collection</span><strong id="statusLastFetch">—</strong></div>
+                </div>
+                <div class="session-progress-block">
+                    <div class="progress-heading">
+                        <span id="progressLabel">Collection progress</span>
+                        <strong id="progressText">No active session</strong>
+                    </div>
+                    <div class="progress-track" role="progressbar" aria-label="Analysis session collection progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressTrack">
+                        <div class="progress-fill" id="sessionProgressBar"></div>
+                    </div>
+                </div>
+                <div class="notice-box"><strong>Note</strong><span>These are model-generated estimates from Open-Meteo weather data, not measurements from a physical solar inverter. The weather observation timestamp may repeat between collections.</span></div>
+            </div>
+        </section>
+
+        <section class="metrics-grid comparison-metrics">
+            <div class="metric-card"><span>WEATHER READINGS</span><strong id="metricCount">0</strong><small>Shared observations collected</small></div>
+            <div class="metric-card plant-one-metric"><span id="metricPlant1Label">PLANT 1 · LATEST AC POWER</span><strong id="metricPlant1Latest">—</strong><small id="metricPlant1Model">XGBoost · kW</small></div>
+            <div class="metric-card plant-two-metric"><span id="metricPlant2Label">PLANT 2 · LATEST AC POWER</span><strong id="metricPlant2Latest">—</strong><small id="metricPlant2Model">Random Forest · kW</small></div>
+            <div class="metric-card"><span>LATEST DIFFERENCE</span><strong id="metricDifference">—</strong><small>Plant 1 minus Plant 2 · kW</small></div>
+        </section>
+
+        <section class="panel session-summary-panel">
+            <div class="panel-heading summary-heading">
+                <div><span class="kicker">SESSION INTELLIGENCE</span><h2>Run summary</h2><p class="muted" id="summaryContext">Select a saved session to calculate its summary.</p></div>
+                <span class="count-pill" id="summaryStatus">NO SESSION</span>
+            </div>
+            <div class="summary-grid">
+                <div class="summary-item"><span>COLLECTION SPAN</span><strong id="summaryDuration">—</strong><small>From first to last saved reading</small></div>
+                <div class="summary-item"><span>AVERAGE SOLAR RADIATION</span><strong id="summaryAverageRadiation">—</strong><small>W/m², weather source scale</small></div>
+                <div class="summary-item"><span>UNIQUE WEATHER TIMES</span><strong id="summaryUniqueWeather">—</strong><small>Distinct observation timestamps</small></div>
+                <div class="summary-item"><span>REPEATED WEATHER TIMES</span><strong id="summaryRepeatedWeather">—</strong><small>Repeated observations in this run</small></div>
+            </div>
+            <p class="summary-insight" id="summaryHighlights">Session statistics will appear when readings are available.</p>
+        </section>
+
+        <section class="panel chart-panel">
+            <div class="panel-heading chart-heading">
+                <div><span class="kicker">SIDE-BY-SIDE SESSION REPORT</span><h2 id="reportTitle">Plant comparison</h2><p id="reportSubtitle" class="muted">Both charts use the same power scale so the model estimates can be compared visually.</p></div>
+                <button class="secondary-button" id="refreshReportButton" type="button">↻ Refresh report</button>
+            </div>
+            <div class="comparison-chart-grid" id="comparisonChartGrid">
+                <article class="plant-chart-card" id="plant1ChartCard">
+                    <div class="plant-chart-heading"><div><span class="plant-chart-label">PLANT 1</span><h3 id="plant1ModelHeading">XGBoost</h3></div><span class="plant-model-pill xgboost-pill">MODEL 01</span></div>
+                    <div class="chart-wrap"><canvas id="powerChart" aria-label="Plant 1 estimated AC power over time"></canvas><div id="chartEmpty" class="chart-empty">No Plant 1 readings to chart yet.</div></div>
+                    <p class="chart-interaction-hint">Hover or tap a point to inspect the Plant 1 reading.</p>
+                </article>
+                <article class="plant-chart-card" id="plant2ChartCard">
+                    <div class="plant-chart-heading"><div><span class="plant-chart-label plant-two-label">PLANT 2</span><h3 id="plant2ModelHeading">Random Forest</h3></div><span class="plant-model-pill forest-pill">MODEL 02</span></div>
+                    <div class="chart-wrap"><canvas id="powerChartPlant2" aria-label="Plant 2 estimated AC power over time"></canvas><div id="chartEmptyPlant2" class="chart-empty">No Plant 2 readings to chart yet.</div></div>
+                    <p class="chart-interaction-hint">Same weather timestamps and shared assumptions as Plant 1.</p>
+                </article>
+            </div>
+            <p class="shared-axis-note">Both charts use a shared vertical scale. The estimates are inverter-level AC power (kW), not whole-plant totals.</p>
+        </section>
+
+        <section class="bottom-grid">
+            <div class="panel sessions-panel">
+                <div class="panel-heading"><div><span class="kicker">SAVED RUNS</span><h2>Past analysis sessions</h2></div><button class="text-button" id="refreshSessionsButton" type="button">Refresh</button></div>
+                <div class="session-filters">
+                    <div class="field">
+                        <label for="sessionSearchInput">Search sessions</label>
+                        <input id="sessionSearchInput" type="search" placeholder="Name, location, notes or category">
+                    </div>
+                    <div class="filter-grid">
+                        <div class="field">
+                            <label for="sessionStatusFilter">Status</label>
+                            <select id="sessionStatusFilter">
+                                <option value="all">All statuses</option>
+                                <option value="active">Active</option>
+                                <option value="stopped">Stopped</option>
+                                <option value="completed">Completed</option>
+                                <option value="interrupted">Interrupted</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="sessionFromDate">From date</label>
+                            <input id="sessionFromDate" type="date">
+                        </div>
+                        <div class="field">
+                            <label for="sessionToDate">To date</label>
+                            <input id="sessionToDate" type="date">
+                        </div>
+                    </div>
+                    <div class="filter-footer"><span id="sessionFilterCount">Showing all sessions</span><button class="text-button" id="clearSessionFilters" type="button">Clear filters</button></div>
+                </div>
+                <div id="sessionsList" class="sessions-list"><div class="list-empty">Loading sessions...</div></div>
+                <p class="table-note">Custom labels, categories, notes, and favorites are stored locally in this browser. Session readings remain stored in Supabase.</p>
+            </div>
+
+            <div class="panel readings-panel">
+                <div class="panel-heading"><div><span class="kicker">COLLECTED DATA</span><h2>Reading details</h2></div><span id="readingTableCount" class="count-pill">0 records</span></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Fetched at</th><th>Weather time</th><th>Ambient °C</th><th>Irradiation</th><th>Plant 1 · XGBoost</th><th>Plant 2 · Random Forest</th></tr></thead>
+                        <tbody id="readingsTableBody"><tr><td colspan="6" class="table-empty">No session selected.</td></tr></tbody>
+                    </table>
+                </div>
+                <p class="table-note">Irradiation is shown on the model's scaled input basis.</p>
+            </div>
+        </section>
+
+        <footer>Solar Power Generation Prediction · Analysis Desk</footer>
+    </main>
+    <script src="analysis.js"></script>
+</body>
+</html>

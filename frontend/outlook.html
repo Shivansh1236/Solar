@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Outlook | SOLAR</title>
+    <link rel="stylesheet" href="outlook.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css">
+</head>
+<body>
+    <header class="navbar">
+        <a href="index.html" class="brand">
+            <div class="brand-icon">☀</div>
+            <div class="brand-text"><strong>SOLAR</strong><span>POWER ANALYSIS</span></div>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">Dashboard</a>
+            <a href="index.html#prediction">Predict</a>
+            <a href="history.html">History</a>
+            <a href="analysis.html">Analysis Desk</a>
+            <a class="active" href="outlook.html">Solar Outlook</a>
+        </nav>
+    </header>
+
+    <main class="page-wrap">
+        <section class="hero">
+            <div class="hero-copy">
+                <div class="eyebrow">FORECAST & GEOGRAPHIC INTELLIGENCE</div>
+                <h1>Solar outlook.<br><span>Across locations.</span></h1>
+                <p>Explore the next 24 hours of weather-driven AC power estimates. Compare Plant 1 and Plant 2 at the same locations using identical hourly weather inputs.</p>
+                <div class="hero-meta">
+                    <span><i class="pulse-dot"></i> 24-HOUR HORIZON</span>
+                    <span>OPEN-METEO WEATHER</span>
+                    <span>PLANT 1 XGBOOST · PLANT 2 RANDOM FOREST</span>
+                </div>
+            </div>
+            <div class="hero-orb"><div class="orb-sun"></div><div class="orb-line line-one"></div><div class="orb-line line-two"></div><div class="orb-line line-three"></div></div>
+        </section>
+
+        <section class="workspace-grid">
+            <div class="panel location-panel">
+                <div class="panel-heading">
+                    <div><span class="kicker">LOCATION PORTFOLIO</span><h2>Build your comparison map</h2></div>
+                    <span class="limit-pill" id="locationCount">0 / 6 LOCATIONS</span>
+                </div>
+                <div class="search-row">
+                    <div class="search-field">
+                        <icon-placeholder>⌕</icon-placeholder>
+                        <input id="citySearch" type="text" placeholder="Search city or location — e.g. Chandigarh, India" autocomplete="off">
+                    </div>
+                    <button id="searchButton" class="primary-button" type="button">Find location <span>→</span></button>
+                </div>
+                <div id="suggestions" class="suggestions" aria-live="polite"></div>
+                <div class="portfolio-heading"><span>YOUR SAVED LOCATIONS</span><small>Saved in this browser</small></div>
+                <div id="locationChips" class="location-chips"><div class="inline-empty">Loading location portfolio…</div></div>
+                <p id="searchMessage" class="inline-message">Add up to six locations to compare their 24-hour outlooks.</p>
+            </div>
+
+            <div class="panel map-panel">
+                <div class="panel-heading map-heading">
+                    <div><span class="kicker">GEOGRAPHIC VIEW</span><h2>Solar locations</h2></div>
+                    <button id="fitMapButton" class="text-button" type="button">Fit all pins ↗</button>
+                </div>
+                <div id="solarMap" class="solar-map" aria-label="Map of saved forecast locations"></div>
+                <div class="map-footer"><span><i class="map-dot"></i> Saved forecast locations</span><span>Click a pin to inspect its outlook</span></div>
+            </div>
+        </section>
+
+        <section class="selected-heading">
+            <div>
+                <span class="kicker">SELECTED LOCATION</span>
+                <h2 id="selectedLocationName">Choose a location</h2>
+                <p id="selectedLocationMeta">Add a city to generate its 24-hour outlook.</p>
+            </div>
+            <div class="selected-actions">
+                <span id="forecastStatus" class="status-pill idle">WAITING FOR LOCATION</span>
+                <button id="refreshForecastButton" class="secondary-button" type="button" disabled>↻ Refresh forecast</button>
+            </div>
+        </section>
+
+        <section class="forecast-metrics">
+            <article class="metric-card feature-metric plant1-metric"><span>PLANT 1 · XGBOOST PEAK</span><strong id="plant1PeakPower">—</strong><small id="plant1PeakTime">Peak time · Plant 1</small></article>
+            <article class="metric-card plant2-metric"><span>PLANT 2 · RANDOM FOREST PEAK</span><strong id="plant2PeakPower">—</strong><small id="plant2PeakTime">Peak time · Plant 2</small></article>
+            <article class="metric-card"><span>PLANT 1 · APPROX. 24H ENERGY</span><strong id="plant1Energy">—</strong><small>kWh · hourly approximation</small></article>
+            <article class="metric-card"><span>PLANT 2 · APPROX. 24H ENERGY</span><strong id="plant2Energy">—</strong><small>kWh · hourly approximation</small></article>
+        </section>
+
+        <section class="panel chart-panel">
+            <div class="panel-heading chart-heading">
+                <div><span class="kicker">HOURLY PROFILE</span><h2>24-hour plant comparison</h2><p id="chartSubtitle">Select a location to compare both plant models using the same forecast weather.</p></div>
+                <div class="chart-controls" role="group" aria-label="Chart metric">
+                    <button class="chart-tab active" data-metric="power" type="button">AC power</button>
+                    <button class="chart-tab" data-metric="irradiation" type="button">Irradiation</button>
+                    <button class="chart-tab" data-metric="temperature" type="button">Temperature</button>
+                </div>
+            </div>
+            <div class="chart-wrap"><canvas id="forecastChart" aria-label="Hourly forecast chart"></canvas><div id="chartEmpty" class="chart-empty">No forecast loaded yet.</div></div>
+            <div class="chart-legend" id="chartLegend"><span><i class="legend-blue"></i> Plant 1 · XGBoost</span><span><i class="legend-green"></i> Plant 2 · Random Forest</span><span class="chart-unit">kW</span></div>
+        </section>
+
+        <section class="panel comparison-panel">
+            <div class="panel-heading">
+                <div><span class="kicker">LOCATION COMPARISON</span><h2>Forecast portfolio</h2><p>Compare both plant models across saved locations. Both forecasts use the same hourly weather inputs.</p></div>
+                <span class="limit-pill">UP TO 6 LOCATIONS</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>LOCATION</th><th>PLANT 1 PEAK</th><th>PLANT 2 PEAK</th><th>PLANT 1 · 24H ENERGY</th><th>PLANT 2 · 24H ENERGY</th><th>PEAK TIMES · P1 / P2</th><th>MAX RADIATION</th><th>STATUS</th><th></th></tr></thead>
+                    <tbody id="comparisonBody"><tr><td colspan="9" class="empty-cell">Add locations to populate the comparison.</td></tr></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel hourly-panel">
+            <div class="panel-heading">
+                <div><span class="kicker">FORECAST DETAIL</span><h2 id="hourlyTitle">Hourly forecast data</h2><p>All times are shown in the selected location's local timezone.</p></div>
+                <span class="limit-pill" id="hourCount">0 HOURLY POINTS</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>LOCAL TIME</th><th>AMBIENT °C</th><th>SHORTWAVE RADIATION W/m²</th><th>MODEL IRRADIATION</th><th>MODULE TEMP °C*</th><th>PLANT 1 · XGBOOST</th><th>PLANT 2 · RANDOM FOREST</th></tr></thead>
+                    <tbody id="hourlyBody"><tr><td colspan="7" class="empty-cell">Select a location to view hourly data.</td></tr></tbody>
+                </table>
+            </div>
+            <p class="table-note">*Module temperature is estimated using the existing project approximation. It is not a measured module temperature.</p>
+        </section>
+
+        <section class="method-note">
+            <div class="method-icon">i</div>
+            <div><strong>How to interpret this outlook</strong><p>Each location uses one Open-Meteo hourly weather forecast. The same ambient temperature, shortwave radiation, estimated module temperature, time fields, and numeric source key are sent to both plant-specific models: Plant 1 XGBoost and Plant 2 Random Forest. Irradiation is scaled by dividing shortwave radiation by 1,000; module temperature follows the project's approximation of ambient temperature + 0.025 × radiation. Source key 0 is supplied to each plant model, but the two plants' source-key encodings were trained independently, so it may refer to different physical inverters. AC_POWER is an inverter-level prediction, not total plant output. Each 24-hour energy figure is a simple hourly sum of predicted kW values, not a meter reading or measured energy forecast. Open-Meteo shortwave radiation is an hourly average. All outputs are estimates, not actual inverter measurements.</p></div>
+        </section>
+
+        <footer>Solar Power Generation Prediction · Solar Outlook · Weather data: Open-Meteo · Map tiles: OpenFreeMap · Data: © OpenStreetMap contributors</footer>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
+    <script src="outlook.js"></script>
+</body>
+</html>

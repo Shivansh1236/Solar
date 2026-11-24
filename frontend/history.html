@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction History | SOLAR</title>
+    <link rel="stylesheet" href="history.css">
+    <link rel="stylesheet" href="shared-ui.css">
+</head>
+<body>
+    <header class="navbar">
+        <a href="index.html" class="brand">
+            <div class="brand-icon">☀</div>
+            <div class="brand-text"><strong>SOLAR</strong><span>POWER ANALYSIS</span></div>
+        </a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="index.html">Dashboard</a>
+            <a href="index.html#prediction">Predict</a>
+            <a href="history.html" class="active">History</a>
+            <a href="analysis.html">Analysis Desk</a>
+            <a href="outlook.html">Solar Outlook</a>
+        </nav>
+    </header>
+
+    <main class="history-container page-wrap">
+        <section class="page-heading">
+            <div class="eyebrow">PREDICTION RECORDS</div>
+            <h1>Prediction History</h1>
+            <p>Review previously generated manual predictions from both solar plants and download their input data for further analysis.</p>
+        </section>
+
+        <section class="stats-grid">
+            <div class="stat-card"><span>TOTAL SAVED PREDICTIONS</span><strong id="totalCount">0</strong><small>Stored in the database</small></div>
+            <div class="stat-card"><span>DISPLAYING RECORDS</span><strong id="displayCount">0</strong><small>Matching current filters</small></div>
+        </section>
+
+        <section class="history-card panel">
+            <div class="history-header">
+                <div><span class="card-label">DATABASE RECORDS</span><h2>Saved predictions</h2><p>Manual predictions from Plant 1 and Plant 2</p></div>
+                <div class="header-actions">
+                    <button id="refreshButton" class="secondary-button" type="button">↻ Refresh</button>
+                    <button id="downloadButton" class="primary-button" type="button" disabled>↓ Download CSV</button>
+                </div>
+            </div>
+
+            <div class="history-controls">
+                <div class="filter-control">
+                    <label for="plantFilter">Filter by plant</label>
+                    <select id="plantFilter" aria-label="Filter predictions by plant">
+                        <option value="all">All plants</option>
+                        <option value="1">Plant 1</option>
+                        <option value="2">Plant 2</option>
+                    </select>
+                </div>
+                <div class="search-area">
+                    <label for="searchInput">Search records</label>
+                    <input type="text" id="searchInput" placeholder="Search by ID, date, plant or model..." aria-label="Search prediction history">
+                </div>
+                <span id="statusMessage" role="status" aria-live="polite">Loading prediction history...</span>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr>
+                        <th>ID</th><th>Saved At</th><th>Plant</th><th>Model</th>
+                        <th>Predicted AC Power</th><th>Source Key</th>
+                        <th>Ambient °C</th><th>Module °C</th><th>Irradiation</th><th>Hour</th>
+                        <th>Day</th><th>Month</th><th>Weekday</th><th>Weekend</th>
+                    </tr></thead>
+                    <tbody id="historyTableBody"><tr><td colspan="14" class="empty-message">Loading records...</td></tr></tbody>
+                </table>
+            </div>
+            <div class="table-footer"><span>Records are arranged from newest to oldest.</span><span>Maximum 500 records per request.</span></div>
+        </section>
+
+        <p class="disclaimer">This page displays previously saved manual model predictions. Live and forecast predictions are not included in this history.</p>
+    </main>
+
+    <script src="history.js"></script>
+</body>
+</html>

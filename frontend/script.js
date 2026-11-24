@@ -1,4 +1,69 @@
+
 const API_URL = "http://127.0.0.1:5000/predict";
+
+const PLANT_MODELS = {
+    "1": {
+        plantName: "Plant 1",
+        modelName: "XGBoost"
+    },
+    "2": {
+        plantName: "Plant 2",
+        modelName: "Random Forest"
+    }
+};
+
+const plantSelector = document.getElementById("plantSelector");
+
+function getSelectedPlantId() {
+    return plantSelector ? plantSelector.value : "1";
+}
+
+function getSelectedPlantConfig() {
+    return PLANT_MODELS[getSelectedPlantId()] || PLANT_MODELS["1"];
+}
+
+function updatePlantSelectionUI(clearPreviousResults = false) {
+    const config = getSelectedPlantConfig();
+    const modelLabel = `${config.plantName} · ${config.modelName}`;
+
+    const selectedPlantModel = document.getElementById("selectedPlantModel");
+    const liveModelLabel = document.getElementById("liveModelLabel");
+    const manualModelLabel = document.getElementById("manualModelLabel");
+
+    if (selectedPlantModel) {
+        selectedPlantModel.textContent = `Active model: ${modelLabel}`;
+    }
+    if (liveModelLabel) {
+        liveModelLabel.textContent = modelLabel;
+    }
+    if (manualModelLabel) {
+        manualModelLabel.textContent = modelLabel;
+    }
+
+    if (clearPreviousResults) {
+        const liveResult = document.getElementById("liveResult");
+        const manualResult = document.getElementById("manualResult");
+        const liveMessage = document.getElementById("liveMessage");
+        const manualMessage = document.getElementById("manualMessage");
+        const liveStatus = document.getElementById("liveResultStatus");
+        const manualStatus = document.getElementById("manualResultStatus");
+
+        if (liveResult) liveResult.textContent = "—";
+        if (manualResult) manualResult.textContent = "—";
+        if (liveMessage) liveMessage.textContent = `Plant changed to ${config.plantName}. Fetch weather or run a new prediction.`;
+        if (manualMessage) manualMessage.textContent = `Ready to predict with ${config.modelName}.`;
+        if (liveStatus) liveStatus.textContent = "AWAITING DATA";
+        if (manualStatus) manualStatus.textContent = "READY";
+    }
+}
+
+if (plantSelector) {
+    plantSelector.addEventListener("change", function () {
+        updatePlantSelectionUI(true);
+    });
+}
+
+updatePlantSelectionUI();
 
 
 // =========================================
@@ -6,14 +71,9 @@ const API_URL = "http://127.0.0.1:5000/predict";
 // =========================================
 
 let liveWeatherData = null;
-
 let liveTimeData = null;
-
 let liveModuleTemperature = null;
 
-
-// The current trained model requires SOURCE_KEY_x.
-// We keep the selected configuration fixed at 0.
 const liveSourceKey = 0;
 
 
@@ -21,47 +81,26 @@ const liveSourceKey = 0;
 // SLOW SMOOTH SCROLL
 // =========================================
 
-function smoothScrollTo(
-    targetElement,
-    duration = 1400
-) {
+function smoothScrollTo(targetElement, duration = 1400) {
 
-    if (!targetElement) {
-        return;
-    }
+    if (!targetElement) return;
 
-
-    const startPosition =
-        window.scrollY;
-
+    const startPosition = window.scrollY;
 
     const targetPosition =
         targetElement.getBoundingClientRect().top +
-        window.scrollY -
-        90;
+        window.scrollY - 90;
 
-
-    const distance =
-        targetPosition -
-        startPosition;
-
+    const distance = targetPosition - startPosition;
 
     let startTime = null;
-
 
     function easeInOutCubic(t) {
 
         return t < 0.5
-
             ? 4 * t * t * t
-
-            : 1 -
-              Math.pow(
-                  -2 * t + 2,
-                  3
-              ) / 2;
+            : 1 - Math.pow(-2 * t + 2, 3) / 2;
     }
-
 
     function animation(currentTime) {
 
@@ -69,46 +108,23 @@ function smoothScrollTo(
             startTime = currentTime;
         }
 
+        const elapsed = currentTime - startTime;
 
-        const elapsed =
-            currentTime -
-            startTime;
+        const progress = Math.min(elapsed / duration, 1);
 
-
-        const progress =
-            Math.min(
-                elapsed / duration,
-                1
-            );
-
-
-        const eased =
-            easeInOutCubic(
-                progress
-            );
-
+        const eased = easeInOutCubic(progress);
 
         window.scrollTo(
             0,
-            startPosition +
-            distance * eased
+            startPosition + distance * eased
         );
 
-
         if (progress < 1) {
-
-            requestAnimationFrame(
-                animation
-            );
-
+            requestAnimationFrame(animation);
         }
-
     }
 
-
-    requestAnimationFrame(
-        animation
-    );
+    requestAnimationFrame(animation);
 }
 
 
@@ -117,46 +133,24 @@ function smoothScrollTo(
 // =========================================
 
 document
-    .querySelectorAll(
-        'a[href^="#"]'
-    )
-    .forEach(
-        function (link) {
+    .querySelectorAll('a[href^="#"]')
+    .forEach(function (link) {
 
-            link.addEventListener(
-                "click",
-                function (event) {
+        link.addEventListener("click", function (event) {
 
-                    const targetId =
-                        this.getAttribute(
-                            "href"
-                        );
+            const targetId = this.getAttribute("href");
 
+            const target = document.querySelector(targetId);
 
-                    const target =
-                        document.querySelector(
-                            targetId
-                        );
+            if (!target) return;
 
+            event.preventDefault();
 
-                    if (!target) {
-                        return;
-                    }
+            smoothScrollTo(target, 1400);
 
+        });
 
-                    event.preventDefault();
-
-
-                    smoothScrollTo(
-                        target,
-                        1400
-                    );
-
-                }
-            );
-
-        }
-    );
+    });
 
 
 // =========================================
@@ -164,122 +158,63 @@ document
 // =========================================
 
 const predictionTabs =
-    document.querySelectorAll(
-        ".prediction-tab"
-    );
-
+    document.querySelectorAll(".prediction-tab");
 
 const predictionPanels =
-    document.querySelectorAll(
-        ".prediction-panel"
-    );
+    document.querySelectorAll(".prediction-panel");
 
+predictionTabs.forEach(function (tab) {
 
-predictionTabs.forEach(
-    function (tab) {
+    tab.addEventListener("click", function () {
 
-        tab.addEventListener(
-            "click",
-            function () {
+        const mode = this.dataset.mode;
 
-                const mode =
-                    this.dataset.mode;
+        predictionTabs.forEach(function (item) {
+            item.classList.remove("active");
+        });
 
+        predictionPanels.forEach(function (panel) {
+            panel.classList.remove("active");
+        });
 
-                predictionTabs.forEach(
-                    function (item) {
+        this.classList.add("active");
 
-                        item.classList.remove(
-                            "active"
-                        );
+        const selectedPanel =
+            document.getElementById(`${mode}-panel`);
 
-                    }
-                );
+        if (selectedPanel) {
+            selectedPanel.classList.add("active");
+        }
 
+    });
 
-                predictionPanels.forEach(
-                    function (panel) {
-
-                        panel.classList.remove(
-                            "active"
-                        );
-
-                    }
-                );
-
-
-                this.classList.add(
-                    "active"
-                );
-
-
-                const selectedPanel =
-                    document.getElementById(
-                        `${mode}-panel`
-                    );
-
-
-                if (selectedPanel) {
-
-                    selectedPanel.classList.add(
-                        "active"
-                    );
-
-                }
-
-            }
-        );
-
-    }
-);
+});
 
 
 // =========================================
 // LOCATION SEARCH
 // =========================================
 
-async function findLocation(
-    locationName
-) {
+async function findLocation(locationName) {
 
     const url =
         "https://geocoding-api.open-meteo.com/v1/search" +
-        `?name=${encodeURIComponent(
-            locationName
-        )}` +
+        `?name=${encodeURIComponent(locationName)}` +
         "&count=1" +
         "&language=en" +
         "&format=json";
 
-
-    const response =
-        await fetch(url);
-
+    const response = await fetch(url);
 
     if (!response.ok) {
-
-        throw new Error(
-            "Location search failed."
-        );
-
+        throw new Error("Location search failed.");
     }
 
+    const data = await response.json();
 
-    const data =
-        await response.json();
-
-
-    if (
-        !data.results ||
-        data.results.length === 0
-    ) {
-
-        throw new Error(
-            "Location not found."
-        );
-
+    if (!data.results || data.results.length === 0) {
+        throw new Error("Location not found.");
     }
-
 
     return data.results[0];
 }
@@ -289,40 +224,23 @@ async function findLocation(
 // WEATHER API
 // =========================================
 
-async function fetchWeather(
-    latitude,
-    longitude
-) {
+async function fetchWeather(latitude, longitude) {
 
     const url =
         "https://api.open-meteo.com/v1/forecast" +
         `?latitude=${latitude}` +
         `&longitude=${longitude}` +
-        "&current=" +
-        "temperature_2m," +
-        "shortwave_radiation" +
+        "&current=temperature_2m,shortwave_radiation" +
         "&temperature_unit=celsius" +
         "&timezone=auto";
 
-
-    const response =
-        await fetch(url);
-
+    const response = await fetch(url);
 
     if (!response.ok) {
-
-        throw new Error(
-            "Weather request failed."
-        );
-
+        throw new Error("Weather request failed.");
     }
 
-
-    const data =
-        await response.json();
-
-
-    return data;
+    return await response.json();
 }
 
 
@@ -330,128 +248,46 @@ async function fetchWeather(
 // TIME FEATURES
 // =========================================
 
-function getTimeFeatures(
-    weatherData
-) {
+function getTimeFeatures(weatherData) {
 
-    /*
-        Open-Meteo returns local time.
+    const timeString = weatherData.current.time;
 
-        Example:
+    const datePart = timeString.split("T")[0];
+    const timePart = timeString.split("T")[1];
 
-        2026-09-25T21:00
+    const dateParts = datePart.split("-");
+    const timeParts = timePart.split(":");
 
-        We use that location-local
-        date/time directly.
-    */
+    const year = Number(dateParts[0]);
+    const month = Number(dateParts[1]);
+    const day = Number(dateParts[2]);
+    const hour = Number(timeParts[0]);
 
-
-    const timeString =
-        weatherData.current.time;
-
-
-    const datePart =
-        timeString.split("T")[0];
-
-
-    const timePart =
-        timeString.split("T")[1];
-
-
-    const dateParts =
-        datePart.split("-");
-
-
-    const timeParts =
-        timePart.split(":");
-
-
-    const year =
-        Number(
-            dateParts[0]
-        );
-
-
-    const month =
-        Number(
-            dateParts[1]
-        );
-
-
-    const day =
-        Number(
-            dateParts[2]
-        );
-
-
-    const hour =
-        Number(
-            timeParts[0]
-        );
-
-
-    /*
-        JavaScript:
-
-        Sunday = 0
-        Monday = 1
-        ...
-        Saturday = 6
-
-        Model:
-
-        Monday = 0
-        ...
-        Sunday = 6
-    */
-
+    // JavaScript: Sunday = 0
+    // Model: Monday = 0, Sunday = 6
 
     const javascriptDay =
         new Date(
-            Date.UTC(
-                year,
-                month - 1,
-                day
-            )
+            Date.UTC(year, month - 1, day)
         ).getUTCDay();
-
 
     const weekday =
         javascriptDay === 0
-
             ? 6
-
             : javascriptDay - 1;
-
-
-    /*
-        This is required internally
-        by the existing Random Forest.
-
-        We do NOT display it.
-    */
 
     const isWeekend =
         javascriptDay === 0 ||
         javascriptDay === 6
-
             ? 1
-
             : 0;
 
-
     return {
-
         HOUR: hour,
-
         DAY: day,
-
         MONTH: month,
-
         WEEKDAY: weekday,
-
         IS_WEEKEND: isWeekend
-
     };
 }
 
@@ -465,19 +301,12 @@ function estimateModuleTemperature(
     irradiationWm2
 ) {
 
-    /*
-        Actual module temperature
-        is not supplied by the weather API.
-
-        Therefore it is estimated from
-        ambient temperature and irradiation.
-    */
-
+    // Actual module temperature is not provided by Open-Meteo.
+    // Estimate it using the existing project formula.
 
     const estimated =
         ambientTemperature +
         irradiationWm2 * 0.025;
-
 
     return Math.max(
         ambientTemperature,
@@ -490,45 +319,19 @@ function estimateModuleTemperature(
 // UPDATE LIVE UI
 // =========================================
 
-function updateLiveUI(
-    weatherData,
-    timeFeatures
-) {
+function updateLiveUI(weatherData, timeFeatures) {
 
-    const current =
-        weatherData.current;
-
+    const current = weatherData.current;
 
     const temperature =
-        Number(
-            current.temperature_2m
-        );
-
+        Number(current.temperature_2m);
 
     const irradiationWm2 =
-        Number(
-            current.shortwave_radiation
-        );
+        Number(current.shortwave_radiation);
 
-
-    /*
-        Open-Meteo gives:
-
-        W/m²
-
-        The training dataset uses
-        irradiation on approximately
-        a 0–1 scale.
-
-        Therefore:
-
-        500 W/m² -> 0.5
-    */
-
-
+    // Convert radiation to approximate model scale
     const irradiationForModel =
         irradiationWm2 / 1000;
-
 
     const moduleTemperature =
         estimateModuleTemperature(
@@ -536,203 +339,129 @@ function updateLiveUI(
             irradiationWm2
         );
 
-
     liveWeatherData = {
 
-        ambientTemperature:
-            temperature,
+        ambientTemperature: temperature,
 
-        irradiationWm2:
-            irradiationWm2,
+        irradiationWm2: irradiationWm2,
 
-        irradiationForModel:
-            irradiationForModel
+        irradiationForModel: irradiationForModel
 
     };
 
+    liveTimeData = timeFeatures;
 
-    liveTimeData =
-        timeFeatures;
-
-
-    liveModuleTemperature =
-        moduleTemperature;
+    liveModuleTemperature = moduleTemperature;
 
 
-    // =====================================
-    // DISPLAY API / TIME VALUES
-    // =====================================
+    // Display weather and time values
 
-    document.getElementById(
-        "liveTemperature"
-    ).textContent =
+    document.getElementById("liveTemperature").textContent =
         temperature.toFixed(1);
 
-
-    document.getElementById(
-        "liveIrradiation"
-    ).textContent =
+    document.getElementById("liveIrradiation").textContent =
         irradiationWm2.toFixed(0);
 
+    document.getElementById("liveHour").textContent =
+        String(timeFeatures.HOUR).padStart(2, "0");
 
-    document.getElementById(
-        "liveHour"
-    ).textContent =
-        String(
-            timeFeatures.HOUR
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    document.getElementById(
-        "liveDay"
-    ).textContent =
+    document.getElementById("liveDay").textContent =
         timeFeatures.DAY;
 
-
-    document.getElementById(
-        "liveMonth"
-    ).textContent =
+    document.getElementById("liveMonth").textContent =
         timeFeatures.MONTH;
 
-
-    document.getElementById(
-        "liveWeekday"
-    ).textContent =
+    document.getElementById("liveWeekday").textContent =
         timeFeatures.WEEKDAY;
 
 
-    // =====================================
-    // DISPLAY ASSUMPTIONS
-    // =====================================
+    // Display model assumptions
 
-    document.getElementById(
-        "assumedModuleTemperature"
-    ).textContent =
+    document.getElementById("assumedModuleTemperature").textContent =
         `${moduleTemperature.toFixed(1)} °C`;
 
-
-    document.getElementById(
-        "assumedSourceKey"
-    ).textContent =
+    document.getElementById("assumedSourceKey").textContent =
         liveSourceKey;
 }
 
 
 // =========================================
-// FETCH WEATHER
+// FETCH WEATHER BUTTON
 // =========================================
 
 const weatherButton =
-    document.getElementById(
-        "weatherButton"
-    );
+    document.getElementById("weatherButton");
 
+weatherButton.addEventListener("click", async function () {
 
-weatherButton.addEventListener(
-    "click",
-    async function () {
+    const locationInput =
+        document.getElementById("location");
 
-        const locationInput =
-            document.getElementById(
-                "location"
-            );
+    const message =
+        document.getElementById("liveMessage");
 
+    const locationName =
+        locationInput.value.trim();
 
-        const message =
-            document.getElementById(
-                "liveMessage"
-            );
-
-
-        const locationName =
-            locationInput.value.trim();
-
-
-        if (!locationName) {
-
-            message.textContent =
-                "Enter a location first.";
-
-            return;
-        }
-
-
-        weatherButton.disabled =
-            true;
-
-
-        weatherButton.innerHTML =
-            "Fetching...";
-
+    if (!locationName) {
 
         message.textContent =
-            "Finding location and retrieving current solar conditions...";
+            "Enter a location first.";
 
+        return;
+    }
 
-        try {
+    weatherButton.disabled = true;
 
-            // Find location
+    weatherButton.innerHTML = "Fetching...";
 
-            const location =
-                await findLocation(
-                    locationName
-                );
+    message.textContent =
+        "Finding location and retrieving current solar conditions...";
 
+    try {
 
-            // Fetch weather
+        // Find location
 
-            const weather =
-                await fetchWeather(
-                    location.latitude,
-                    location.longitude
-                );
+        const location =
+            await findLocation(locationName);
 
+        // Fetch weather
 
-            // Get time
-
-            const timeFeatures =
-                getTimeFeatures(
-                    weather
-                );
-
-
-            // Update UI
-
-            updateLiveUI(
-                weather,
-                timeFeatures
+        const weather =
+            await fetchWeather(
+                location.latitude,
+                location.longitude
             );
 
+        // Extract time features
 
-            message.textContent =
-                `Live conditions loaded for ${location.name}.`;
+        const timeFeatures =
+            getTimeFeatures(weather);
 
-        } catch (error) {
+        // Update interface
 
-            console.error(
-                error
-            );
+        updateLiveUI(weather, timeFeatures);
 
+        message.textContent =
+            `Live conditions loaded for ${location.name}.`;
 
-            message.textContent =
-                "Could not fetch live conditions. Check the location or internet connection.";
+    } catch (error) {
 
-        } finally {
+        console.error(error);
 
-            weatherButton.disabled =
-                false;
+        message.textContent =
+            "Could not fetch live conditions. Check the location or internet connection.";
 
+    } finally {
 
-            weatherButton.innerHTML =
-                "Fetch weather <span>→</span>";
+        weatherButton.disabled = false;
 
-        }
+        weatherButton.innerHTML =
+            "Fetch weather <span>→</span>";
 
     }
-);
+
+});
 
 
 // =========================================
@@ -740,187 +469,136 @@ weatherButton.addEventListener(
 // =========================================
 
 const livePredictButton =
-    document.getElementById(
-        "livePredict"
-    );
+    document.getElementById("livePredict");
+
+livePredictButton.addEventListener("click", async function () {
+
+    const result =
+        document.getElementById("liveResult");
+
+    const message =
+        document.getElementById("liveMessage");
 
 
-livePredictButton.addEventListener(
-    "click",
-    async function () {
+    // Weather must be fetched first
 
-        const result =
-            document.getElementById(
-                "liveResult"
-            );
-
-
-        const message =
-            document.getElementById(
-                "liveMessage"
-            );
-
-
-        // Weather must be fetched first
-
-        if (
-            !liveWeatherData ||
-            !liveTimeData ||
-            liveModuleTemperature === null
-        ) {
-
-            message.textContent =
-                "Fetch weather conditions first.";
-
-            return;
-        }
-
-
-        livePredictButton.disabled =
-            true;
-
+    if (
+        !liveWeatherData ||
+        !liveTimeData ||
+        liveModuleTemperature === null
+    ) {
 
         message.textContent =
-            "Running Random Forest prediction...";
+            "Fetch weather conditions first.";
+
+        return;
+    }
+
+    const requestedPlantId = getSelectedPlantId();
+    const requestedPlant = PLANT_MODELS[requestedPlantId];
+
+    livePredictButton.disabled = true;
+    if (plantSelector) plantSelector.disabled = true;
+
+    message.textContent =
+        `Running ${requestedPlant.modelName} prediction for ${requestedPlant.plantName}...`;
 
 
-        /*
-            The existing trained model
-            expects exactly these 9 features.
+    // Prepare all nine model inputs
 
-            The website displays only
-            the useful/relevant ones.
+    const predictionData = {
 
-            IS_WEEKEND remains internal.
-        */
+        plant_id: Number(requestedPlantId),
 
+        SOURCE_KEY_x:
+            liveSourceKey,
 
-        const predictionData = {
+        AMBIENT_TEMPERATURE:
+            liveWeatherData.ambientTemperature,
 
+        MODULE_TEMPERATURE:
+            liveModuleTemperature,
 
-            // ASSUMPTION
+        IRRADIATION:
+            liveWeatherData.irradiationForModel,
 
-            SOURCE_KEY_x:
-                liveSourceKey,
+        HOUR:
+            liveTimeData.HOUR,
 
+        DAY:
+            liveTimeData.DAY,
 
-            // OPEN-METEO
+        MONTH:
+            liveTimeData.MONTH,
 
-            AMBIENT_TEMPERATURE:
-                liveWeatherData
-                    .ambientTemperature,
+        WEEKDAY:
+            liveTimeData.WEEKDAY,
 
+        IS_WEEKEND:
+            liveTimeData.IS_WEEKEND,
 
-            // ASSUMPTION
+        // Identify this as a live prediction
+        prediction_mode: "live"
 
-            MODULE_TEMPERATURE:
-                liveModuleTemperature,
-
-
-            // OPEN-METEO
-
-            IRRADIATION:
-                liveWeatherData
-                    .irradiationForModel,
-
-
-            // TIME
-
-            HOUR:
-                liveTimeData.HOUR,
+    };
 
 
-            DAY:
-                liveTimeData.DAY,
+    try {
 
+        const response =
+            await fetch(
+                API_URL,
+                {
 
-            MONTH:
-                liveTimeData.MONTH,
+                    method: "POST",
 
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
 
-            WEEKDAY:
-                liveTimeData.WEEKDAY,
+                    body: JSON.stringify(predictionData)
 
-
-            // INTERNAL ONLY
-
-            IS_WEEKEND:
-                liveTimeData.IS_WEEKEND
-
-        };
-
-
-        try {
-
-            const response =
-                await fetch(
-                    API_URL,
-                    {
-
-                        method:
-                            "POST",
-
-                        headers:
-                            {
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                        body:
-                            JSON.stringify(
-                                predictionData
-                            )
-
-                    }
-                );
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Prediction request failed."
-                );
-
-            }
-
-
-            const data =
-                await response.json();
-
-
-            const prediction =
-                Number(
-                    data.predicted_ac_power
-                );
-
-
-            result.textContent =
-                prediction.toFixed(2);
-
-
-            message.textContent =
-                "Prediction generated from the current solar conditions.";
-
-
-        } catch (error) {
-
-            console.error(
-                error
+                }
             );
 
+        const data = await response.json();
 
-            message.textContent =
-                "Could not connect to the prediction backend.";
-
-        } finally {
-
-            livePredictButton.disabled =
-                false;
-
+        if (!response.ok) {
+            throw new Error(data.error || "Prediction request failed.");
         }
 
+        const prediction = Number(data.predicted_ac_power);
+        if (!Number.isFinite(prediction)) {
+            throw new Error("The backend returned an invalid prediction.");
+        }
+
+        result.textContent = prediction.toFixed(2);
+
+        const returnedPlant = data.plant_name || requestedPlant.plantName;
+        const returnedModel = data.model_name || requestedPlant.modelName;
+        const modelLabel = `${returnedPlant} · ${returnedModel}`;
+
+        document.getElementById("liveModelLabel").textContent = modelLabel;
+        document.getElementById("liveResultStatus").textContent = "PREDICTION READY";
+        message.textContent = `Prediction generated for ${returnedPlant} using ${returnedModel}.`;
+
+        // Live predictions are NOT saved in manual history.
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.textContent =
+            "Could not connect to the prediction backend.";
+
+    } finally {
+
+        livePredictButton.disabled = false;
+        if (plantSelector) plantSelector.disabled = false;
+
     }
-);
+
+});
 
 
 // =========================================
@@ -932,57 +610,31 @@ function getManualInputs() {
     return {
 
         SOURCE_KEY_x:
-            document.getElementById(
-                "sourceKey"
-            ).value,
-
+            document.getElementById("sourceKey").value,
 
         AMBIENT_TEMPERATURE:
-            document.getElementById(
-                "ambientTemperature"
-            ).value,
-
+            document.getElementById("ambientTemperature").value,
 
         MODULE_TEMPERATURE:
-            document.getElementById(
-                "moduleTemperature"
-            ).value,
-
+            document.getElementById("moduleTemperature").value,
 
         IRRADIATION:
-            document.getElementById(
-                "irradiation"
-            ).value,
-
+            document.getElementById("irradiation").value,
 
         HOUR:
-            document.getElementById(
-                "hour"
-            ).value,
-
+            document.getElementById("hour").value,
 
         DAY:
-            document.getElementById(
-                "day"
-            ).value,
-
+            document.getElementById("day").value,
 
         MONTH:
-            document.getElementById(
-                "month"
-            ).value,
-
+            document.getElementById("month").value,
 
         WEEKDAY:
-            document.getElementById(
-                "weekday"
-            ).value,
-
+            document.getElementById("weekday").value,
 
         IS_WEEKEND:
-            document.getElementById(
-                "isWeekend"
-            ).value
+            document.getElementById("isWeekend").value
 
     };
 
@@ -993,26 +645,23 @@ function getManualInputs() {
 // VALIDATE MANUAL INPUTS
 // =========================================
 
-function validateManualInputs(
-    data
-) {
+function validateManualInputs(data) {
 
-    for (
-        const key in data
-    ) {
+    for (const key in data) {
 
         if (
             data[key] === "" ||
             data[key] === null ||
             data[key] === undefined
         ) {
-
             return false;
+        }
 
+        if (!Number.isFinite(Number(data[key]))) {
+            return false;
         }
 
     }
-
 
     return true;
 }
@@ -1022,21 +671,13 @@ function validateManualInputs(
 // CONVERT MANUAL INPUTS
 // =========================================
 
-function convertManualInputs(
-    data
-) {
+function convertManualInputs(data) {
 
-    Object.keys(data).forEach(
-        function (key) {
+    Object.keys(data).forEach(function (key) {
 
-            data[key] =
-                Number(
-                    data[key]
-                );
+        data[key] = Number(data[key]);
 
-        }
-    );
-
+    });
 
     return data;
 }
@@ -1047,127 +688,152 @@ function convertManualInputs(
 // =========================================
 
 const manualPredictButton =
-    document.getElementById(
-        "manualPredict"
-    );
+    document.getElementById("manualPredict");
+
+manualPredictButton.addEventListener("click", async function () {
+
+    const result =
+        document.getElementById("manualResult");
+
+    const message =
+        document.getElementById("manualMessage");
+
+    let data = getManualInputs();
 
 
-manualPredictButton.addEventListener(
-    "click",
-    async function () {
+    // Check all inputs
 
-        const result =
-            document.getElementById(
-                "manualResult"
-            );
-
-
-        const message =
-            document.getElementById(
-                "manualMessage"
-            );
-
-
-        let data =
-            getManualInputs();
-
-
-        if (
-            !validateManualInputs(
-                data
-            )
-        ) {
-
-            message.textContent =
-                "Please fill in all model inputs.";
-
-            return;
-        }
-
-
-        data =
-            convertManualInputs(
-                data
-            );
-
-
-        manualPredictButton.disabled =
-            true;
-
+    if (!validateManualInputs(data)) {
 
         message.textContent =
-            "Running Random Forest prediction...";
+            "Please fill in all model inputs with valid numbers.";
+
+        return;
+    }
 
 
-        try {
+    // Convert input strings to numbers
 
-            const response =
-                await fetch(
-                    API_URL,
-                    {
-
-                        method:
-                            "POST",
-
-                        headers:
-                            {
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                        body:
-                            JSON.stringify(
-                                data
-                            )
-
-                    }
-                );
+    data = convertManualInputs(data);
 
 
-            if (!response.ok) {
+    // Basic input validation
 
-                throw new Error(
-                    "Prediction request failed."
-                );
+    if (
+        data.HOUR < 0 || data.HOUR > 23 ||
+        data.DAY < 1 || data.DAY > 31 ||
+        data.MONTH < 1 || data.MONTH > 12 ||
+        data.WEEKDAY < 0 || data.WEEKDAY > 6 ||
+        ![0, 1].includes(data.IS_WEEKEND)
+    ) {
 
-            }
+        message.textContent =
+            "Please check the date, time and weekend values.";
 
-
-            const responseData =
-                await response.json();
-
-
-            const prediction =
-                Number(
-                    responseData
-                        .predicted_ac_power
-                );
+        return;
+    }
 
 
-            result.textContent =
-                prediction.toFixed(2);
+    const requestedPlantId = getSelectedPlantId();
+    const requestedPlant = PLANT_MODELS[requestedPlantId];
+
+    manualPredictButton.disabled = true;
+    if (plantSelector) plantSelector.disabled = true;
+
+    message.textContent =
+        `Running ${requestedPlant.modelName} prediction for ${requestedPlant.plantName}...`;
 
 
-            message.textContent =
-                "Prediction generated successfully.";
+    try {
 
+        // Send manual prediction request to Flask
 
-        } catch (error) {
+        const response =
+            await fetch(
+                API_URL,
+                {
 
-            console.error(
-                error
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        ...data,
+
+                        plant_id: Number(requestedPlantId),
+
+                        // Identify this as a manual prediction
+                        prediction_mode: "manual"
+
+                    })
+
+                }
             );
 
 
-            message.textContent =
-                "Could not connect to the prediction backend.";
+        if (!response.ok) {
 
-        } finally {
+            const errorData = await response.json();
 
-            manualPredictButton.disabled =
-                false;
+            throw new Error(
+                errorData.error || "Prediction request failed."
+            );
 
         }
 
+
+        const responseData =
+            await response.json();
+
+
+        const prediction =
+            Number(responseData.predicted_ac_power);
+
+
+        if (!Number.isFinite(prediction)) {
+            throw new Error("The backend returned an invalid prediction.");
+        }
+
+        // Display prediction and the model that produced it.
+        result.textContent = prediction.toFixed(2);
+
+        const returnedPlant = responseData.plant_name || requestedPlant.plantName;
+        const returnedModel = responseData.model_name || requestedPlant.modelName;
+        const modelLabel = `${returnedPlant} · ${returnedModel}`;
+
+        document.getElementById("manualModelLabel").textContent = modelLabel;
+        document.getElementById("manualResultStatus").textContent = "PREDICTION READY";
+
+        // Show database save status
+
+        if (responseData.history_saved === true) {
+
+            message.textContent =
+                `Prediction generated for ${returnedPlant} using ${returnedModel} and saved to history! ID: ${responseData.prediction_id}`;
+
+        } else {
+
+            message.textContent =
+                `Prediction generated for ${returnedPlant} using ${returnedModel}, but could not save it to history.`;
+
+        }
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.textContent =
+            error.message || "Could not connect to the prediction backend.";
+
+    } finally {
+
+        manualPredictButton.disabled = false;
+        if (plantSelector) plantSelector.disabled = false;
+
     }
-);
+
+});
